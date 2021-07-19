@@ -1,0 +1,56 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+def gradientDescent(x, y):
+    theta0 = 0          #initial value of theta0
+    theta1 = 0          #initial value of theta1
+    m = len(x)          #total number of samples in the training set
+    alpha = 0.0001      #learning rate
+    
+    for i in range(50000):
+        hypothesis = theta0 + theta1*x                                  #hypothesis or prediction
+        cost = (1/(2*m))*sum((y - hypothesis)**2)                       #cost with the current values of theta0 and theta1
+        temp0 = theta0 - (alpha*((-1/m)*sum(y - hypothesis)))           #calculating the new value for theta0
+        temp1 = theta1 - (alpha*((-1/m)*sum(x*(y - hypothesis))))       #calculating the new value for thata1
+        theta0 = temp0                                                  #updating the value of theta0
+        theta1 = temp1                                                  #updating the value of theta1
+    
+    print("theta0 = {}, theta1 = {}, cost = {}".format(theta0, theta1, cost))
+    
+    parameters = np.array([theta0, theta1])         #numpy array containing the optimized parameters
+    return parameters
+        
+
+def predictOutput(parameters, x):
+    theta0 = parameters[0]
+    theta1 = parameters[1]
+    
+    output = theta0 + theta1*x
+    return output
+
+
+df_train = pd.read_csv('kc_house_train_data.csv')
+df_test = pd.read_csv('kc_house_test_data.csv')
+
+#plot = plt.scatter(df.sqft_living, df.price)
+#print(df[['sqft_living', 'price']].corr())
+
+x_train = df_train['sqft_living']                   #training input feature dataframe
+x_train = (df_train['sqft_living'] - df_train['sqft_living'].min()) / (df_train['sqft_living'].max() - df_train['sqft_living'].min())   #normalization
+y_train = df_train['price']                         #training output feature dataframe
+
+x_test = df_test['sqft_living']                     #testing input feature dataframe
+x_test = (df_test['sqft_living'] - df_test['sqft_living'].min()) / (df_test['sqft_living'].max() - df_test['sqft_living'].min())    #normalization
+y_test = df_test['price']
+
+np_x_train = x_train.values                         #normalized training input feature numpy array                       
+np_y_train = y_train.values                         #training output feature numpy array
+
+np_x_test = x_test.values                           #normalized testing input feature numpy array                       
+np_y_test = y_test.values                           #testing output feature numpy array
+
+parameters = gradientDescent(np_x_train, np_y_train)
+prediction = predictOutput(parameters, 0.17436974789915966)
+
+print("Predicted value = {}".format(prediction))
